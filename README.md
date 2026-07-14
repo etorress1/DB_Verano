@@ -32,7 +32,7 @@ Sistema_Cotizacion_SQLite/
 
 ### Esquema Entidad-Relación
 
-![Esquema ER](img/esquema_er.png)
+![Esquema ER](img/ModeloER_PoryectoBD.png)
 
 
 ## Modelo de datos
