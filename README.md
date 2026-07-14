@@ -32,8 +32,11 @@ Sistema_Cotizacion_SQLite/
 
 ### Esquema Entidad-Relación
 
-![Esquema ER](img/ModeloER_PoryectoBD.png)
+<div align="center">
 
+<img src="img/ModeloER_PoryectoBD.png" alt="Esquema Entidad-Relación" width="850"/>
+
+</div>
 
 ## Modelo de datos
 
