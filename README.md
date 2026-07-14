@@ -1,10 +1,10 @@
 # Sistema de Cotización - Don Lucho
 
-Proyecto final de Base de Datos desarrollado en **SQLite** para gestionar el proceso de cotización de productos en la empresa Don Lucho.
+Proyecto final de Base de Datos  en **SQLite** para gestionar el proceso de cotización de productos en la empresa Don Lucho.
 
 ## Descripción
 
-Este proyecto implementa una base de datos relacional para administrar clientes, categorías, productos, cotizaciones y órdenes de trabajo. El sistema utiliza restricciones de integridad, claves primarias, claves foráneas, vistas y triggers para garantizar la consistencia de la información y automatizar reglas de negocio.
+Este proyecto implementa una base de datos relacional para administrar clientes, categorías, productos, cotizaciones y órdenes de trabajo. El sistema utiliza restricciones de integridad, primary keys, foreign keys, vistas y triggers para garantizar la consistencia de la información y automatizar reglas de negocio.
 
 ---
 
@@ -13,8 +13,7 @@ Este proyecto implementa una base de datos relacional para administrar clientes,
 ```
 Sistema_Cotizacion_SQLite/
 │
-├── Sistema_Cotizacion_SQLite.sql
-├── Datos.sql
+├── Sistema_Cotizacion_SQLite.db
 ├── ConsultasDB.txt
 ├── Trigger_y_prueba.txt
 ├── Vista_y_prueba.txt
@@ -62,81 +61,94 @@ El sistema está conformado por las siguientes entidades:
 
 ## Tablas
 
+## Esquema relacional
+
 ### Cliente
 
-| Campo | Tipo |
-|-------|------|
-| cliente_id | INTEGER |
-| identificacion | TEXT |
-| nombre | TEXT |
-| tipo_cliente | TEXT |
-| telefono | TEXT |
-| correo | TEXT |
-| direccion | TEXT |
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| cliente_id | INTEGER | PK | AUTOINCREMENT |
+| identificacion | TEXT | | NOT NULL, UNIQUE |
+| nombre | TEXT | | NOT NULL |
+| tipo_cliente | TEXT | | NOT NULL, CHECK ('Persona','Empresa','Institucion') |
+| telefono | TEXT | | NOT NULL |
+| correo | TEXT | | |
+| direccion | TEXT | | |
 
-### Categoría
+---
 
-| Campo | Tipo |
-|-------|------|
-| categoria_id | INTEGER |
-| nombre_categoria | TEXT |
-| descripcion | TEXT |
+### Categoria
+
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| categoria_id | INTEGER | PK | AUTOINCREMENT |
+| nombre_categoria | TEXT | | NOT NULL, UNIQUE |
+| descripcion | TEXT | | |
+
+---
 
 ### Producto
 
-| Campo | Tipo |
-|-------|------|
-| producto_id | INTEGER |
-| categoria_id | INTEGER |
-| nombre_producto | TEXT |
-| descripcion | TEXT |
-| precio_base | REAL |
-| stock_disponible | INTEGER |
-| activo | INTEGER |
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| producto_id | INTEGER | PK | AUTOINCREMENT |
+| categoria_id | INTEGER | FK | NOT NULL, REFERENCES Categoria(categoria_id) |
+| nombre_producto | TEXT | | NOT NULL |
+| descripcion | TEXT | | |
+| precio_base | REAL | | NOT NULL, CHECK(precio_base > 0) |
+| stock_disponible | INTEGER | | NOT NULL, CHECK(stock_disponible >= 0) |
+| activo | INTEGER | | NOT NULL, CHECK(activo IN (0,1)) |
 
-### Cotización
+---
 
-| Campo | Tipo |
-|-------|------|
-| cotizacion_id | INTEGER |
-| cliente_id | INTEGER |
-| fecha_creacion | TEXT |
-| estado | TEXT |
-| descuento | REAL |
-| observaciones | TEXT |
-| total | REAL |
+### Cotizacion
 
-### Detalle_Cotización
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| cotizacion_id | INTEGER | PK | AUTOINCREMENT |
+| cliente_id | INTEGER | FK | NOT NULL, REFERENCES Cliente(cliente_id) |
+| fecha_creacion | TEXT | | NOT NULL |
+| estado | TEXT | | NOT NULL, CHECK ('Pendiente','Aprobada','Rechazada','Finalizada') |
+| descuento | REAL | | DEFAULT 0, CHECK(descuento >= 0) |
+| observaciones | TEXT | | |
+| total | REAL | | NOT NULL, CHECK(total >= 0) |
 
-| Campo | Tipo |
-|-------|------|
-| detalle_id | INTEGER |
-| cotizacion_id | INTEGER |
-| producto_id | INTEGER |
-| cantidad | INTEGER |
-| precio_unitario | REAL |
-| subtotal | REAL |
+---
+
+### Detalle_Cotizacion
+
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| detalle_id | INTEGER | PK | AUTOINCREMENT |
+| cotizacion_id | INTEGER | FK | NOT NULL, REFERENCES Cotizacion(cotizacion_id) |
+| producto_id | INTEGER | FK | NOT NULL, REFERENCES Producto(producto_id) |
+| cantidad | INTEGER | | NOT NULL, CHECK(cantidad > 0) |
+| precio_unitario | REAL | | NOT NULL, CHECK(precio_unitario > 0) |
+| subtotal | REAL | | NOT NULL, CHECK(subtotal >= 0) |
+
+---
 
 ### Orden_Trabajo
 
-| Campo | Tipo |
-|-------|------|
-| orden_id | INTEGER |
-| cotizacion_id | INTEGER |
-| fecha_inicio | TEXT |
-| fecha_entrega | TEXT |
-| estado_produccion | TEXT |
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| orden_id | INTEGER | PK | AUTOINCREMENT |
+| cotizacion_id | INTEGER | FK | NOT NULL, UNIQUE, REFERENCES Cotizacion(cotizacion_id) |
+| fecha_inicio | TEXT | | NOT NULL |
+| fecha_entrega | TEXT | | NOT NULL |
+| estado_produccion | TEXT | | NOT NULL, CHECK ('Pendiente','Produccion','Completada','Entregada') |
+
+---
 
 ### Historial_Estado
 
-| Campo | Tipo |
-|-------|------|
-| historial_id | INTEGER |
-| cotizacion_id | INTEGER |
-| estado_anterior | TEXT |
-| estado_nuevo | TEXT |
-| fecha_cambio | TEXT |
-
+| Campo | Tipo | Llave | Restricciones |
+|--------|------|:-----:|----------------|
+| historial_id | INTEGER | PK | AUTOINCREMENT |
+| cotizacion_id | INTEGER | FK | NOT NULL, REFERENCES Cotizacion(cotizacion_id) |
+| estado_anterior | TEXT | | NOT NULL |
+| estado_nuevo | TEXT | | NOT NULL |
+| fecha_cambio | TEXT | | NOT NULL |
 ---
 
 ## Restricciones implementadas
@@ -149,6 +161,21 @@ La base de datos utiliza distintos mecanismos para garantizar la integridad de l
 - Campos obligatorios (`NOT NULL`).
 - Restricciones (`CHECK`).
 - Valores por defecto (`DEFAULT`).
+
+---
+
+## Consultas
+
+```
+ConsultasDB.txt
+```
+
+- JOIN entre tablas.
+- Funciones de agregación.
+- Consultas con `GROUP BY`.
+- Filtros con `WHERE` y `HAVING`.
+- Ordenamientos.
+- Subconsultas.
 
 ---
 
@@ -172,35 +199,18 @@ La implementación y pruebas se encuentran en:
 Vista_y_prueba.txt
 ```
 
----
-
-## Consultas
-
-El archivo `ConsultasDB.txt` contiene consultas SQL para demostrar el funcionamiento del sistema, incluyendo:
-
-- JOIN entre tablas.
-- Funciones de agregación.
-- Consultas con `GROUP BY`.
-- Filtros con `WHERE` y `HAVING`.
-- Ordenamientos.
-- Subconsultas.
-
----
-
-## Ejecución
-
-1. Crear una base de datos en SQLite.
-2. Ejecutar el script `Sistema_Cotizacion_SQLite.sql`.
-3. Ejecutar `Datos.sql` para cargar la información de prueba.
-4. Ejecutar las consultas, la vista y el trigger para verificar el funcionamiento del sistema.
 
 ---
 
 ## Justificación del modelo relacional
 
-Se eligió un modelo relacional porque la información mantiene relaciones claramente definidas entre clientes, productos, categorías, cotizaciones y órdenes de trabajo. El uso de claves primarias, claves foráneas y restricciones permite preservar la integridad de los datos y realizar consultas mediante `JOIN`.
+En este sistema, SQL relacional es la mejor opción porque la información depende de relaciones bien definidas entre clientes, cotizaciones, productos, categorías y órdenes de trabajo. Las claves primarias, claves foráneas y restricciones garantizan la integridad de los datos y permiten realizar consultas flexibles mediante JOIN.
 
-Una consulta menos eficiente en este modelo consiste en recuperar una cotización completa junto con todos sus productos y detalles en una sola estructura. En una base de datos documental como MongoDB esta información podría almacenarse como un único documento anidado, evitando múltiples uniones entre tablas. Sin embargo, el modelo relacional ofrece una mejor integridad referencial, reduce la duplicación de datos y facilita el mantenimiento de la información, por lo que resulta más adecuado para este proyecto.
+Sin embargo, una lectura que sería menos eficiente en un modelo relacional sería consultar una cotización completa como un único documento con todos sus productos, cantidades y observaciones anidadas. Para obtener esa información es necesario unir varias tablas, como Cotizacion, Cliente, Detalle_Cotizacion, Producto y Categoria.
+
+En un modelo documental, donde se podría usar MongoDB, toda la información de una cotización podría almacenarse dentro de un único documento con un arreglo de productos. Esto permitiría recuperar la cotización completa mediante una sola consulta, sin utilizar JOIN. El costo de ese enfoque sería una mayor duplicación de información y una menor capacidad para mantener la integridad referencial entre productos, categorías y clientes.
+Por ello, para este proyecto se eligió el modelo relacional, ya que la prioridad es mantener reglas de integridad, evitar inconsistencias y facilitar consultas sobre datos relacionados.
+
 
 ---
 
