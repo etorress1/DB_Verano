@@ -30,6 +30,11 @@ Sistema_Cotizacion_SQLite/
 
 ---
 
+### Esquema Entidad-Relación
+
+![Esquema ER](img/esquema_er.png)
+
+
 ## Modelo de datos
 
 El sistema está conformado por las siguientes entidades:
