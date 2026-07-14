@@ -34,7 +34,7 @@ Sistema_Cotizacion_SQLite/
 
 <div align="center">
 
-<img src="img/ModeloER_PoryectoBD.png" alt="Esquema Entidad-Relación" width="850"/>
+<img src="ModeloER_PoryectoBD.png" alt="Esquema Entidad-Relación" width="850"/>
 
 </div>
 
