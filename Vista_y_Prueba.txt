@@ -1,0 +1,69 @@
+--VISTA Y PRUEBA DE LA VISTA:
+
+PRAGMA foreign_keys = ON;
+
+----------------------------------------------------
+-- VISTA DE REPORTE COMPLETO DE COTIZACIONES
+----------------------------------------------------
+
+CREATE VIEW Vista_Cotizaciones_Detalladas AS
+
+
+SELECT
+
+    c.cotizacion_id,
+
+    cl.identificacion,
+
+    cl.nombre AS cliente,
+
+    cl.tipo_cliente,
+
+    c.fecha_creacion,
+
+    c.estado,
+
+    ca.nombre_categoria,
+
+    p.nombre_producto,
+
+    dc.cantidad,
+
+    dc.precio_unitario,
+
+    dc.subtotal,
+
+    c.descuento,
+
+    c.total
+
+FROM Cotizacion c
+
+INNER JOIN Cliente cl
+
+ON c.cliente_id = cl.cliente_id
+
+INNER JOIN Detalle_Cotizacion dc
+
+ON c.cotizacion_id = dc.cotizacion_id
+
+INNER JOIN Producto p
+
+ON dc.producto_id = p.producto_id
+
+INNER JOIN Categoria ca
+
+ON p.categoria_id = ca.categoria_id;
+
+--PRUEBA DE LA VISTA:
+SELECT
+
+cliente,
+
+SUM(subtotal) AS monto_total
+
+FROM Vista_Cotizaciones_Detalladas
+
+GROUP BY cliente
+
+ORDER BY monto_total DESC;

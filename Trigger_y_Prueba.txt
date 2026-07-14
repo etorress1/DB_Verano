@@ -1,0 +1,85 @@
+--TRIGGER:
+PRAGMA foreign_keys = ON;
+
+----------------------------------------------------
+-- TRIGGER:
+-- Registrar automáticamente cambios de estado de una cotización
+----------------------------------------------------
+
+CREATE TRIGGER registrar_cambio_estado
+
+AFTER UPDATE OF estado ON Cotizacion
+
+WHEN OLD.estado <> NEW.estado
+
+BEGIN
+
+INSERT INTO Historial_Estado
+(
+    cotizacion_id,
+    estado_anterior,
+    estado_nuevo,
+    fecha_cambio
+)
+
+VALUES
+(
+    NEW.cotizacion_id,
+
+    OLD.estado,
+
+    NEW.estado,
+
+    DATE('now')
+);
+
+END;
+
+
+----PRUEBA DEL TRIGGER:
+-----REVISAR ESTADO
+
+SELECT 
+    cotizacion_id,
+    cliente_id,
+    estado
+FROM Cotizacion
+WHERE cotizacion_id = 3;
+
+---------REVISAR HISTORIAL
+
+-- SELECT *
+-- FROM Historial_Estado
+-- WHERE cotizacion_id = 3;
+
+------ACTIVAR TRIGGER
+
+-- UPDATE Cotizacion
+
+-- SET estado = 'Aprobada'
+
+-- WHERE cotizacion_id = 3;
+
+--------COMPROBAR TRIGGER
+
+-- SELECT *
+
+-- FROM Historial_Estado
+
+-- WHERE cotizacion_id = 3;
+
+---------------ADICIONAL-----------------
+
+-- UPDATE Cotizacion
+
+-- SET estado = 'Finalizada'
+
+-- WHERE cotizacion_id = 3;
+
+--------------------------
+
+-- SELECT *
+
+-- FROM Historial_Estado
+
+-- WHERE cotizacion_id = 3;
